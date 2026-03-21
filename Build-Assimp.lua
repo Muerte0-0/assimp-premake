@@ -1,3 +1,87 @@
+function generateConfigHeader(input, output, defines, replacements)
+    os.mkdir(path.getdirectory(output))
+
+    local file = io.open(input, "r")
+    if not file then
+        error("Failed to open " .. input)
+    end
+
+    local content = file:read("*all")
+    file:close()
+
+    defines = defines or {}
+    replacements = replacements or {}
+
+    -- Handle #cmakedefine01
+    content = content:gsub("#cmakedefine01%s+(%w+)", function(def)
+        if defines[def] == false then
+            return "#define " .. def .. " 0"
+        else
+            return "#define " .. def .. " 1"
+        end
+    end)
+
+    -- Handle #cmakedefine
+    content = content:gsub("#cmakedefine%s+(%w+)", function(def)
+        if defines[def] == false then
+            return "/* #undef " .. def .. " */"
+        else
+            return "#define " .. def
+        end
+    end)
+
+    -- Handle @TOKEN@ replacements
+    for key, value in pairs(replacements) do
+    content = content:gsub("@" .. key .. "@", value)
+	end
+	
+	content = content:gsub("@[%w_]+@", "0")
+
+    local out = io.open(output, "w")
+    out:write(content)
+    out:close()
+
+    print("Generated: " .. output)
+end
+
+-- Assimp config
+generateConfigHeader(
+    "include/assimp/config.h.in",
+    "_config_headers/assimp/config.h",
+    {
+        ASSIMP_BUILD_NO_EXPORT = true,
+        ASSIMP_BUILD_DLL_EXPORT = false
+    },{}
+)
+
+generateConfigHeader(
+    "include/assimp/revision.h.in",
+    "_config_headers/assimp/revision.h",
+    {},
+    {
+        GIT_COMMIT_HASH = "0",
+        GIT_BRANCH = "master",
+
+        ASSIMP_VERSION_MAJOR = "6",
+        ASSIMP_VERSION_MINOR = "0",
+        ASSIMP_VERSION_PATCH = "4",
+        ASSIMP_PACKAGE_VERSION = "0",
+
+        CMAKE_SHARED_LIBRARY_PREFIX = "",
+        LIBRARY_SUFFIX = "",
+        CMAKE_DEBUG_POSTFIX = "d"
+    }
+)
+
+-- Zlib config (zconf.h)
+generateConfigHeader(
+    "contrib/zlib/zconf.h.in",
+    "_config_headers/zlib/zconf.h",
+    {
+        -- Add flags if needed
+    },{}
+)
+
 project "Assimp"
     kind "StaticLib"
     language "C++"
@@ -8,41 +92,47 @@ objdir (ThirdPartyIntDir)
 
 includedirs
 {
-	"_config_headers/",
-	"_config_headers/assimp/",
-	".",
-	"contrib/",
-	"contrib/irrXML/",
-	"contrib/unzip/",
-	"contrib/rapidjson/include/",
-	"contrib/pugixml/src/",
-	"contrib/zlib/",
-	"contrib/utf8cpp/source",
-	"code",
-	"include",
+	'_config_headers/',
+	'_config_headers/assimp/',
+	'_config_headers/zlib/',
+	'./',
+	'contrib/',
+	'contrib/irrXML/',
+	'contrib/unzip/',
+	'contrib/rapidjson/include/',
+	'contrib/pugixml/src/',
+	'contrib/zlib/',
+	'contrib/utf8cpp/source',
+	'code',
+	'include',
 }
 
 files
 {
 	-- Dependencies
-	"contrib/unzip/**",
-	"contrib/irrXML/**",
-	"contrib/zlib/*",
+	'contrib/unzip/**',
+	'contrib/irrXML/**',
+	'contrib/zlib/*',
+	
 	-- Common
-	"code/Common/**",
-	"code/PostProcessing/**",
-	"code/Material/**",
-	"code/CApi/**",
-	"code/Geometry/**",
+	'code/Common/**',
+	'code/PostProcessing/**',
+	'code/Material/**',
+	'code/CApi/**',
+	'code/Geometry/**',
+	
 	-- Importers
-	"code/AssetLib/IQM/**",
-	"code/AssetLib/Assbin/**",
+	'code/AssetLib/IQM/**',
+	'code/AssetLib/Assbin/**',
 
-	"code/AssetLib/Collada/**",
-	"code/AssetLib/Obj/**",
-	"code/AssetLib/FBX/**",
-
-	"code/Assbin/**"
+	'code/AssetLib/Collada/**',
+	'code/AssetLib/Obj/**',
+	--'/code/AssetLib/Blender/**',
+	--'contrib/poly2tri/poly2tri/**',
+	'code/AssetLib/FBX/**',
+	-- 'code/glTF2/**',
+	-- 'code/glTF/**',
+	'code/Assbin/**' -- For caching
 }
 
 removefiles
@@ -113,3 +203,18 @@ defines
 
 filter "system:linux"
 	defines { "HAVE_UNISTD_H" }
+	
+filter "configurations:Debug"
+	defines "KE_DEBUG"
+	runtime "Debug"
+	symbols "on"
+
+filter "configurations:Release"
+	defines "KE_RELEASE"
+	runtime "Release"
+	optimize "on"
+
+filter "configurations:Dist"
+	defines "KE_DIST"
+	runtime "Release"
+	optimize "on"
