@@ -133,8 +133,8 @@ files
 	--'/code/AssetLib/Blender/**',
 	--'contrib/poly2tri/poly2tri/**',
 	'code/AssetLib/FBX/**',
-	-- 'code/glTF2/**',
-	-- 'code/glTF/**',
+	'code/glTF2/**',
+	'code/glTF/**',
 	'code/Assbin/**' -- For caching
 }
 
@@ -169,7 +169,7 @@ defines
 	"ASSIMP_BUILD_NO_CSM_IMPORTER",
 	"ASSIMP_BUILD_NO_DXF_IMPORTER",
 	-- "ASSIMP_BUILD_NO_FBX_IMPORTER",
-	"ASSIMP_BUILD_NO_GLTF_IMPORTER",
+	--"ASSIMP_BUILD_NO_GLTF_IMPORTER",
 	"ASSIMP_BUILD_NO_HMP_IMPORTER",
 	"ASSIMP_BUILD_NO_IFC_IMPORTER",
 	"ASSIMP_BUILD_NO_IRR_IMPORTER",
