@@ -86,7 +86,6 @@ project "Assimp"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
-	staticruntime "on"
 
 targetdir (ThirdPartyBinDir)
 objdir (ThirdPartyIntDir)
