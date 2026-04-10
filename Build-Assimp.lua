@@ -35,7 +35,7 @@ function generateConfigHeader(input, output, defines, replacements)
     content = content:gsub("@" .. key .. "@", value)
 	end
 	
-	content = content:gsub("@[%w_]+@", "0")
+	content = content:gsub("@[%w_]+@", "")
 
     local out = io.open(output, "w")
     out:write(content)
@@ -90,6 +90,8 @@ project "Assimp"
 targetdir (ThirdPartyBinDir)
 objdir (ThirdPartyIntDir)
 
+disablewarnings { "4244" }
+
 includedirs
 {
 	'_config_headers/',
@@ -113,6 +115,7 @@ files
 	'contrib/unzip/**',
 	'contrib/irrXML/**',
 	'contrib/zlib/*',
+	'contrib/pugixml/src/*',
 	
 	-- Common
 	'code/Common/**',
