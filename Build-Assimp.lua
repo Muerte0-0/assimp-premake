@@ -44,6 +44,16 @@ function generateConfigHeader(input, output, defines, replacements)
     print("Generated: " .. output)
 end
 
+project "Assimp"
+    kind "StaticLib"
+    language "C++"
+    cppdialect "C++17"
+	staticruntime "on"
+	warnings "off"
+
+targetdir (ThirdPartyBinDir)
+objdir (ThirdPartyIntDir)
+
 -- Assimp config
 generateConfigHeader(
     "include/assimp/config.h.in",
@@ -81,16 +91,6 @@ generateConfigHeader(
         -- Add flags if needed
     },{}
 )
-
-project "Assimp"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-	staticruntime "on"
-	warnings "off"
-
-targetdir (ThirdPartyBinDir)
-objdir (ThirdPartyIntDir)
 
 includedirs
 {
